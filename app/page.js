@@ -87,7 +87,7 @@ export default function FarewellPage() {
         className="mt-24 z-10"
       >
         <img
-          src="/test.jpg"
+          src="/douki.jpg"
           alt="同期の集合写真"
           className="rounded-2xl shadow-2xl w-4/5 max-w-2xl mx-auto border-4 border-white/80 ring-4 ring-blue-100/60"
         />
