@@ -1,10 +1,9 @@
 "use client";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useEffect, useState } from "react";
 
 export default function FarewellPage() {
   const [messages, setMessages] = useState([]);
-  const [loaded, setLoaded] = useState(false);
   const [newMessage, setNewMessage] = useState({ name: "", text: "", image: "" });
 
   // 初期メッセージ読み込み
@@ -18,15 +17,12 @@ export default function FarewellPage() {
         { name: "鈴木", text: "飲み会の幹事おつかれ！また集まろう！", image: "" },
       ]);
     }
-    setLoaded(true);
   }, []);
 
-  // localStorage保存
+  // messages変更時にlocalStorage保存
   useEffect(() => {
-    if (loaded) {
-      localStorage.setItem("farewellMessages", JSON.stringify(messages));
-    }
-  }, [messages, loaded]);
+    localStorage.setItem("farewellMessages", JSON.stringify(messages));
+  }, [messages]);
 
   // IntersectionObserverでフェードイン
   useEffect(() => {
@@ -41,7 +37,17 @@ export default function FarewellPage() {
     );
     elements.forEach((el) => observer.observe(el));
     return () => observer.disconnect();
-  }, [messages, loaded]);
+  }, [messages]);
+
+  const handleFileSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      setNewMessage({ ...newMessage, image: reader.result });
+    };
+    reader.readAsDataURL(file);
+  };
 
   const addMessage = (e) => {
     e.preventDefault();
@@ -51,23 +57,7 @@ export default function FarewellPage() {
   };
 
   const deleteMessage = (index) => {
-    setMessages((prev) =>
-      prev.map((msg, i) => (i === index ? { ...msg, deleting: true } : msg))
-    );
-    setTimeout(() => {
-      setMessages((prev) => prev.filter((_, i) => i !== index));
-    }, 400);
-  };
-
-  const handleFileSelect = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setNewMessage({ ...newMessage, image: reader.result });
-      };
-      reader.readAsDataURL(file);
-    }
+    setMessages((prev) => prev.filter((_, i) => i !== index));
   };
 
   return (
@@ -77,7 +67,7 @@ export default function FarewellPage() {
         {[...Array(50)].map((_, i) => (
           <div
             key={i}
-            className={`absolute bg-white rounded-full opacity-70 animate-fall`}
+            className="absolute bg-white rounded-full opacity-70 animate-fall"
             style={{
               width: `${Math.random() * 6 + 2}px`,
               height: `${Math.random() * 6 + 2}px`,
@@ -110,88 +100,79 @@ export default function FarewellPage() {
       </motion.div>
 
       {/* メインメッセージ */}
-      {loaded && (
-        <div className="mt-10 text-2xl font-semibold text-blue-900 drop-shadow-md z-10">
-          これからもがんばって！❄️
-        </div>
-      )}
+      <div className="mt-10 text-2xl font-semibold text-blue-900 drop-shadow-md z-10">
+        これからもがんばって！❄️
+      </div>
 
       {/* 個別メッセージリスト */}
-      {loaded && (
-        <div className="mt-20 w-full max-w-2xl px-6 z-10">
-          <AnimatePresence>
-            {messages.map((msg, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: msg.deleting ? 0 : 1, y: msg.deleting ? 20 : 0 }}
-                exit={{ opacity: 0, y: 20 }}
-                transition={{ duration: 0.4 }}
-                className="fade-in opacity-0 transform translate-y-8 mb-8 bg-white/20 p-6 rounded-2xl shadow-lg backdrop-blur-sm border border-blue-300 relative"
+      <div className="mt-20 w-full max-w-2xl px-6 z-10">
+        <AnimatePresence>
+          {messages.map((msg, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              transition={{ duration: 0.4 }}
+              className="fade-in opacity-0 transform translate-y-8 mb-8 bg-white/20 p-6 rounded-2xl shadow-lg backdrop-blur-sm border border-blue-300 relative"
+            >
+              {msg.image && (
+                <img
+                  src={msg.image}
+                  alt="添付画像"
+                  className="w-full max-h-48 object-cover rounded-lg mb-3"
+                />
+              )}
+              <p className="text-lg text-blue-800 mb-3 leading-relaxed">{msg.text}</p>
+              <p className="text-right text-sm text-blue-600">- {msg.name}</p>
+              <button
+                onClick={() => deleteMessage(i)}
+                className="absolute top-2 right-2 text-red-500 hover:text-red-700 text-sm"
               >
-                {msg.image && (
-                  <img
-                    src={msg.image}
-                    alt="添付画像"
-                    className="w-full max-h-48 object-cover rounded-lg mb-3"
-                  />
-                )}
-                <p className="text-lg text-blue-800 mb-3 leading-relaxed">{msg.text}</p>
-                <p className="text-right text-sm text-blue-600">- {msg.name}</p>
-                <button
-                  onClick={() => deleteMessage(i)}
-                  className="absolute top-2 right-2 text-red-500 hover:text-red-700 text-sm"
-                >
-                  削除
-                </button>
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </div>
-      )}
+                削除
+              </button>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
 
       {/* メッセージ追加フォーム */}
-      {loaded && (
-        <div className="mt-12 mb-20 w-full max-w-md bg-white/20 p-6 rounded-2xl shadow-lg backdrop-blur-md border border-blue-300 z-10">
-          <h2 className="text-lg font-semibold text-blue-900 mb-4">メッセージを追加する 💬</h2>
-          <form onSubmit={addMessage} className="space-y-3">
-            <input
-              type="text"
-              placeholder="名前"
-              value={newMessage.name}
-              onChange={(e) => setNewMessage({ ...newMessage, name: e.target.value })}
-              className="w-full p-2 rounded-lg bg-white/70 text-gray-700 placeholder-gray-500 focus:outline-none"
-            />
-            <textarea
-              placeholder="メッセージ"
-              value={newMessage.text}
-              onChange={(e) => setNewMessage({ ...newMessage, text: e.target.value })}
-              className="w-full p-2 rounded-lg bg-white/70 text-gray-700 placeholder-gray-500 focus:outline-none h-24"
-            />
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => {
-                const file = e.target.files[0];
-                if (file) {
-                  const reader = new FileReader();
-                  reader.onload = () => {
-                    setNewMessage({ ...newMessage, image: reader.result });
-                  };
-                  reader.readAsDataURL(file);
-                }
-              }}
-              className="w-full p-2 rounded-lg bg-white/70 text-gray-700 placeholder-gray-500 focus:outline-none"
-            />
-            <button
-              type="submit"
-              className="w-full bg-blue-300 hover:bg-blue-400 text-blue-900 font-semibold py-2 rounded-lg transition-colors"
-            >
-              追加する
-            </button>
-          </form>
-        </div>
-      )}
+      <div className="mt-12 mb-20 w-full max-w-md bg-white/20 p-6 rounded-2xl shadow-lg backdrop-blur-md border border-blue-300 z-10">
+        <h2 className="text-lg font-semibold text-blue-900 mb-4">メッセージを追加する 💬</h2>
+        <form onSubmit={addMessage} className="space-y-3">
+          <input
+            type="text"
+            placeholder="名前"
+            value={newMessage.name}
+            onChange={(e) => setNewMessage({ ...newMessage, name: e.target.value })}
+            className="w-full p-2 rounded-lg bg-white/70 text-gray-700 placeholder-gray-500 focus:outline-none"
+          />
+          <textarea
+            placeholder="メッセージ"
+            value={newMessage.text}
+            onChange={(e) => setNewMessage({ ...newMessage, text: e.target.value })}
+            className="w-full p-2 rounded-lg bg-white/70 text-gray-700 placeholder-gray-500 focus:outline-none h-24"
+          />
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (!file) return;
+              const reader = new FileReader();
+              reader.onload = () => setNewMessage({ ...newMessage, image: reader.result });
+              reader.readAsDataURL(file);
+            }}
+            className="w-full p-2 rounded-lg bg-white/70 text-gray-700 placeholder-gray-500 focus:outline-none"
+          />
+          <button
+            type="submit"
+            className="w-full bg-blue-300 hover:bg-blue-400 text-blue-900 font-semibold py-2 rounded-lg transition-colors"
+          >
+            追加する
+          </button>
+        </form>
+      </div>
 
       <footer className="text-blue-900 text-sm mb-10 z-10">
         <p>With love from your colleagues ❄️</p>
