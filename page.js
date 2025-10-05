@@ -118,7 +118,7 @@ export default function FarewellPage() {
 
       {/* メインメッセージ */}
       <div className="mt-10 text-2xl font-semibold text-blue-900 drop-shadow-md z-10">
-        これからもがんばって！❄️
+        愛莉　これからもがんばって！❄️
       </div>
 
       {/* メッセージリスト */}
