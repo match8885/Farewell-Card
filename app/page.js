@@ -9,20 +9,58 @@ export default function FarewellPage() {
   // 初期メッセージ読み込み
   useEffect(() => {
     const saved = localStorage.getItem("farewellMessages");
-    if (saved) {
-      setMessages(JSON.parse(saved));
-    } else {
+    if (saved) setMessages(JSON.parse(saved));
+    else
       setMessages([
         { name: "佐藤", text: "一緒に働けて本当に楽しかったです！", image: "" },
         { name: "鈴木", text: "飲み会の幹事おつかれ！また集まろう！", image: "" },
       ]);
-    }
   }, []);
 
-  // messages変更時にlocalStorage保存
+  // messages保存
   useEffect(() => {
     localStorage.setItem("farewellMessages", JSON.stringify(messages));
   }, [messages]);
+
+  // 画像を安全にリサイズして読み込む関数
+  const handleFileSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const maxDim = 1024; // 最大幅・高さ
+        let { width, height } = img;
+        if (width > maxDim || height > maxDim) {
+          const scale = Math.min(maxDim / width, maxDim / height);
+          width = width * scale;
+          height = height * scale;
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height);
+        const resizedDataUrl = canvas.toDataURL("image/jpeg", 0.8); // 画質80%
+        setNewMessage({ ...newMessage, image: resizedDataUrl });
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const addMessage = (e) => {
+    e.preventDefault();
+    if (!newMessage.name || !newMessage.text) return;
+    setMessages([...messages, newMessage]);
+    setNewMessage({ name: "", text: "", image: "" });
+  };
+
+  const deleteMessage = (index) => {
+    setMessages((prev) => prev.filter((_, i) => i !== index));
+  };
 
   // IntersectionObserverでフェードイン
   useEffect(() => {
@@ -39,30 +77,9 @@ export default function FarewellPage() {
     return () => observer.disconnect();
   }, [messages]);
 
-  const handleFileSelect = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      setNewMessage({ ...newMessage, image: reader.result });
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const addMessage = (e) => {
-    e.preventDefault();
-    if (!newMessage.name || !newMessage.text) return;
-    setMessages([...messages, newMessage]);
-    setNewMessage({ name: "", text: "", image: "" });
-  };
-
-  const deleteMessage = (index) => {
-    setMessages((prev) => prev.filter((_, i) => i !== index));
-  };
-
   return (
     <div className="relative min-h-screen flex flex-col items-center text-center text-gray-800 overflow-hidden bg-gradient-to-b from-blue-200 via-blue-100 to-blue-200">
-      {/* 雪アニメーション */}
+      {/* 雪 */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         {[...Array(50)].map((_, i) => (
           <div
@@ -79,7 +96,7 @@ export default function FarewellPage() {
         ))}
       </div>
 
-      {/* 背景光アニメーション */}
+      {/* 背景光 */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute w-[120%] h-[120%] bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.15),transparent_70%)] animate-pulse-slow"></div>
         <div className="absolute w-[120%] h-[120%] bg-[radial-gradient(circle_at_70%_60%,rgba(173,216,230,0.2),transparent_70%)] animate-pulse-slower"></div>
@@ -104,7 +121,7 @@ export default function FarewellPage() {
         これからもがんばって！❄️
       </div>
 
-      {/* 個別メッセージリスト */}
+      {/* メッセージリスト */}
       <div className="mt-20 w-full max-w-2xl px-6 z-10">
         <AnimatePresence>
           {messages.map((msg, i) => (
@@ -156,13 +173,7 @@ export default function FarewellPage() {
           <input
             type="file"
             accept="image/*"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (!file) return;
-              const reader = new FileReader();
-              reader.onload = () => setNewMessage({ ...newMessage, image: reader.result });
-              reader.readAsDataURL(file);
-            }}
+            onChange={handleFileSelect}
             className="w-full p-2 rounded-lg bg-white/70 text-gray-700 placeholder-gray-500 focus:outline-none"
           />
           <button
