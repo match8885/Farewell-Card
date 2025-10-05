@@ -186,7 +186,7 @@ export default function FarewellPage() {
       </div>
 
       <footer className="text-blue-900 text-sm mb-10 z-10">
-        <p>With love from your Kkakura Works colleagues ❄️</p>
+        <p>With love from your Kamakura Works colleagues ❄️</p>
       </footer>
 
       <style>{`
