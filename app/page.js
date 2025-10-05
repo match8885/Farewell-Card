@@ -118,7 +118,7 @@ export default function FarewellPage() {
 
       {/* メインメッセージ */}
       <div className="mt-10 text-2xl font-semibold text-blue-900 drop-shadow-md z-10">
-        これからもがんばって！❄️
+        愛莉　これからもがんばって！❄️
       </div>
 
       {/* メッセージリスト */}
@@ -186,7 +186,7 @@ export default function FarewellPage() {
       </div>
 
       <footer className="text-blue-900 text-sm mb-10 z-10">
-        <p>With love from your colleagues ❄️</p>
+        <p>With love from your Kkakura Works colleagues ❄️</p>
       </footer>
 
       <style>{`
