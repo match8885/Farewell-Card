@@ -117,8 +117,8 @@ export default function FarewellPage() {
       </motion.div>
 
       {/* メインメッセージ */}
-      <div className="mt-10 text-2xl font-semibold text-blue-900 drop-shadow-md z-10">
-        愛莉　これからもがんばって！❄️
+      <div className="mt-10 text-2xl font-semibold text-blue-900 drop-shadow-md z-10 whitespace-pre-line">
+        愛莉おつかれさま！{"\n"}これからもがんばって！❄️
       </div>
 
       {/* メッセージリスト */}
@@ -186,7 +186,7 @@ export default function FarewellPage() {
       </div>
 
       <footer className="text-blue-900 text-sm mb-10 z-10">
-        <p>With love from your Kamakura Works colleagues ❄️</p>
+        <p>With love from your colleagues ❄️</p>
       </footer>
 
       <style>{`
