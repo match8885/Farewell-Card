@@ -117,7 +117,7 @@ export default function FarewellPage() {
       </motion.div>
 
       {/* メインメッセージ */}
-      <div className="mt-10 text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold text-blue-900 drop-shadow-md z-10 whitespace-pre-line">
+      <div className="mt-10 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-semibold text-blue-900 drop-shadow-md z-10 whitespace-pre-line">
         愛莉おつかれさま！{"\n"}これからもがんばって！
       </div>
 
