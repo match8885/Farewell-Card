@@ -112,7 +112,7 @@ export default function FarewellPage() {
         <img
           src="/douki.jpg"
           alt="同期の集合写真"
-          className="rounded-2xl shadow-2xl w-4/5 max-w-2xl mx-auto border-4 border-blue-300"
+          className="w-full max-w-sm md:max-w-md lg:max-w-xl h-auto object-cover rounded-2xl shadow-lg border-4 border-blue-300"
         />
       </motion.div>
 
